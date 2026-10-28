@@ -1,0 +1,14 @@
+{
+  "type": "code",
+  "name": "Ruin the Fun",
+  "modid": "ruinthefun",
+  "description": "Client menu for homes, movement speed, one-hit blocks, no-fall, flight, and fast place.",
+  "authors": [
+    "Kei"
+  ],
+  "version": "1.5.0",
+  "side": "Client",
+  "dependencies": {
+    "game": "1.22.2"
+  }
+}

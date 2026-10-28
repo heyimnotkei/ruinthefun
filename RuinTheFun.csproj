@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <AssemblyName>RuinTheFun</AssemblyName>
+    <RootNamespace>RuinTheFun</RootNamespace>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <Optimize>true</Optimize>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+
+  <!--
+    Set VSGamePath to your Vintage Story installation directory, e.g.:
+      Windows: C:\Program Files\Vintagestory
+      Linux:   /opt/vintagestory
+    You can also pass it via the command line:
+      dotnet build /p:VSGamePath="C:\Program Files\Vintagestory"
+  -->
+  <PropertyGroup Condition="'$(VSGamePath)' == ''">
+    <VSGamePath>C:\Program Files\Vintagestory</VSGamePath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="VintagestoryAPI">
+      <HintPath>$(VSGamePath)\VintagestoryAPI.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="VintagestoryLib">
+      <HintPath>$(VSGamePath)\VintagestoryLib.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Cairo">
+      <HintPath>$(VSGamePath)\Lib\Cairo.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+</Project>

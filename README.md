@@ -13,4 +13,3 @@ dotnet build .\RuinTheFun.csproj /p:VSGamePath="C:\Program Files\Vintagestory"
 ```
 
 The mod targets Vintage Story 1.22.2.
-
