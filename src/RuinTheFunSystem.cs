@@ -64,12 +64,24 @@ internal class RuinTheFunSystem : ModSystem
             ["ruinthefunonehitblock"] = (GlKeys.O, GlKeys.K)
         };
 
+    private static readonly Dictionary<string, string> LegacyHotkeyCodes =
+        new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["vintageclientsettings"] = "ruinthefunsettings",
+            ["vintageclienthotkeyoverlay"] = "ruinthefunhotkeyoverlay",
+            ["vintageclientonehitblock"] = "ruinthefunonehitblock",
+            ["vintageclienthomeport"] = "ruinthefunhomeport",
+            ["vintageclientflight"] = "ruinthefunflight",
+            ["vintageclientfastplace"] = "ruinthefunfastplace"
+        };
+
     private ICoreClientAPI          api;
     private RuinTheFunGUI        settingsDialog;
     private RuinTheFunHelpDialog helpDialog;
     private RuinTheFunHotkeyOverlayHud        hotkeyOverlay;
     private RuinTheFunConfig     config = new RuinTheFunConfig();
     private const string ConfigFile = "RuinTheFunConfig.json";
+    private const string LegacyConfigFile = "VintageClientConfig.json";
 
     // ── Public properties ─────────────────────────────────────────────────────
 
@@ -232,6 +244,12 @@ internal class RuinTheFunSystem : ModSystem
         try
         {
             var loaded = api.LoadModConfig<RuinTheFunConfig>(ConfigFile);
+            bool migratedConfig = false;
+            if (loaded is null)
+            {
+                loaded = api.LoadModConfig<RuinTheFunConfig>(LegacyConfigFile);
+                migratedConfig = loaded is not null;
+            }
             if (loaded is null) { SaveConfig(); return; }
             config = loaded;
             config.Hotkeys ??= new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -240,6 +258,7 @@ internal class RuinTheFunSystem : ModSystem
             config.HomePoses ??= new Dictionary<string, HomeEntry>();
             config.ExampleGreetingText ??= "Ruin the Fun ready!";
             bool dirty = UpgradeLegacyHotkeys(config.Hotkeys);
+            dirty |= migratedConfig;
             if (float.IsNaN(config.MovementSpeedMultiplier) || float.IsInfinity(config.MovementSpeedMultiplier))
             { config.MovementSpeedMultiplier = 1f; dirty = true; }
             float cl = GameMath.Clamp(config.MovementSpeedMultiplier, 1f, 3f);
@@ -252,6 +271,13 @@ internal class RuinTheFunSystem : ModSystem
     private bool UpgradeLegacyHotkeys(Dictionary<string, string> hotkeys)
     {
         bool changed = false;
+        foreach (var migration in LegacyHotkeyCodes)
+        {
+            if (hotkeys.TryGetValue(migration.Key, out string saved)
+                && !hotkeys.ContainsKey(migration.Value))
+                hotkeys[migration.Value] = saved;
+            changed |= hotkeys.Remove(migration.Key);
+        }
         foreach (var m in HotkeyMigrations)
         {
             if (!hotkeys.TryGetValue(m.Key, out string s) || string.IsNullOrWhiteSpace(s)) continue;
@@ -587,3 +613,4 @@ internal class RuinTheFunSystem : ModSystem
         }
     }
 }
+
